@@ -37,6 +37,13 @@ from ufoLib2.objects.misc import (
 )
 from ufoLib2.typing import HasIdentifier, PathLike, T
 
+try:
+    import iondrive
+
+    have_iondrive = True
+except ImportError as e:
+    have_iondrive = False
+
 
 def _convert_Info(value: Union[Info, Mapping[str, Any]]) -> Info:
     return value if isinstance(value, Info) else Info(**value)
@@ -188,6 +195,10 @@ class Font:
             validate: If True, enable UFO data model validation during loading. If
                 False, load whatever is deserializable.
         """
+        if have_iondrive:
+            import ufoLib2.objects
+
+            return iondrive.load(ufoLib2.objects, str(path))
         reader = UFOReader(path, validate=validate)
         self = cls.read(reader, lazy=lazy)
         self._path = path
